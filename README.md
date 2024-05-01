@@ -34,7 +34,8 @@ func buildEggCipherMessage() -> String {
 ```
 
 ```swift
-      .onAppear {
-        secret = buildEggCipherMessage()
-      }
+body
+  .onAppear {
+    secret = buildEggCipherMessage()
+  }
 ```
