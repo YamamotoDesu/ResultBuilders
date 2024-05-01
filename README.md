@@ -1,6 +1,9 @@
 
 
 ## Making Your First Result Builder
+
+![image](https://github.com/YamamotoDesu/ResultBuilders/assets/47273077/1541ac0f-5012-4af0-9965-c63863861549)
+
 ```swift
 // 1
 @resultBuilder
@@ -27,5 +30,11 @@ func buildEggCipherMessage() -> String {
   "4 planets have come to our attention"
   "regarding a plot that could jeopardize spice production."
 }
+
 ```
 
+```swift
+      .onAppear {
+        secret = buildEggCipherMessage()
+      }
+```
