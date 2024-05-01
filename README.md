@@ -65,3 +65,91 @@ enum CipherBuilder {
   }
 
 ```
+
+SuperSecretCipher
+```swift
+struct SuperSecretCipher {
+  let offset: Int
+
+  @CipherBuilder
+  var cipherRule: CipherRule {
+    LetterSubstitution(offset: offset)
+  }
+}
+```
+
+CipherBuilder
+```swift
+@resultBuilder
+enum CipherBuilder {
+  static func buildBlock(_ components: CipherRule...) -> CipherRule {
+    components
+  }
+}
+```
+
+CipherRule
+```swift
+protocol CipherRule {
+  func encipher(_ value: String) -> String
+  func decipher(_ value: String) -> String
+}
+
+// 1
+extension Array: CipherRule where Element == CipherRule {
+  // 2
+  func encipher(_ value: String) -> String {
+    // 3
+    reduce(value) { encipheredMessage, secret in
+      secret.encipher(encipheredMessage)
+    }
+  }
+
+  func decipher(_ value: String) -> String {
+  // 4
+    reversed().reduce(value) { decipheredMessage, secret in
+      secret.decipher(decipheredMessage)
+    }
+  }
+}
+```
+
+LetterSubstitution
+```swift
+struct LetterSubstitution: CipherRule {
+  let letters: [String]
+  let offset: Int
+
+  // 1
+  init(offset: Int) {
+    self.letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".map(String.init)
+    self.offset = max(1, min(offset, 25))
+  }
+
+  // 2
+  func swapLetters(_ value: String, offset: Int) -> String {
+    // 3
+    let plainText = value.map(String.init)
+    // 4
+    return plainText.reduce("") { message, letter in
+      if let index = letters.firstIndex(of: letter.uppercased()) {
+        let cipherOffset = (index + offset) % 26
+        let cipherIndex = cipherOffset < 0 ? 26
+          + cipherOffset : cipherOffset
+        let cipherLetter = letters[cipherIndex]
+        return message + cipherLetter
+      } else {
+        return message + letter
+      }
+    }
+  }
+
+  func encipher(_ value: String) -> String {
+    swapLetters(value, offset: offset)
+  }
+
+  func decipher(_ value: String) -> String {
+    swapLetters(value, offset: -offset)
+  }
+}
+```
